@@ -51,7 +51,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      release_body_file: body.txt
+      RELEASE_BODY_FILE: body.txt
     outputs:
       new_version: ${{ steps.release-files.outputs.new_version }}
       all_files_sha: ${{ steps.release-files.outputs.all_files_sha }}
@@ -72,11 +72,23 @@ jobs:
       - name: Check files
         run: ls artifacts/**/*
 
+      # prepare release
+      - name: Prepare release files
+        id: release-files
+        run: .github/scripts/prepare-release.sh
+        env:
+          tag_ref: ${{ github.ref }}
+
+      # build
+      - name: Check files
+        run: ls release/*
+
       # release
-      - name: Release
+      - name: Release package
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/*
+          body_path: ${{ env.RELEASE_BODY_FILE }}
+          files: release/*
           draft: false
           prerelease: false
         env:
