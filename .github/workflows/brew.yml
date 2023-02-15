@@ -46,7 +46,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: nosana-node-${{ runner.os }}
+          name: nosana-node
           path: target/*.jar
           if-no-files-found: error
 
