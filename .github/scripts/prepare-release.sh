@@ -50,7 +50,9 @@ EOF
 echo "## SHA 256" > "../${RELEASE_BODY_FILE}"
 for file in *.sha256sum
 do
-  echo "- $(cat "${file}")" >> "../${RELEASE_BODY_FILE}"
+  all_files_sha=
+
+  echo "- \`$( cat "${file}" | cut -f 1 -d ' ' )\` ${file}" >> "../${RELEASE_BODY_FILE}"
 done
 
 cat <<EOF >> "../${RELEASE_BODY_FILE}"
