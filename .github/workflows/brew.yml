@@ -17,30 +17,30 @@ jobs:
 
     steps:
       # repo
-      - name: Checkout sources
+      - name: '[${{ runner.os }}] Checkout sources'
         uses: actions/checkout@v3
         with:
           submodules: 'true'
 
       # java
-      - name: Prepare java
+      - name: '[${{ runner.os }}] Prepare java'
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
 
       # clojure
-      - name: Install clojure tools
+      - name: '[${{ runner.os }}] Install clojure tools'
         uses: DeLaGuardo/setup-clojure@10.1
         with:
           cli: 1.10.1.693
 
       # clj
-      - name: Clojure check
+      - name: '[${{ runner.os }}] Clojure check'
         run: clojure --version
 
       # build
-      - name: Clojure Uber Build
+      - name: '[${{ runner.os }}] Clojure Uber Build'
         run: clojure -X:compile uberjar
 
       # artifact
