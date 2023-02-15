@@ -35,10 +35,6 @@ jobs:
         with:
           cli: 1.10.1.693
 
-      # clj
-      - name: '[${{ runner.os }}] Clojure check'
-        run: clojure --version
-
       # build
       - name: '[${{ runner.os }}] Clojure Uber Build'
         run: clojure -X:compile uberjar
