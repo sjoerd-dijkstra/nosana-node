@@ -108,8 +108,8 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     env:
-      new_version: ${{ needs.release.outputs.new_version }}
-      all_files_sha: ${{ needs.release.outputs.all_files_sha }}
+      NEW_VERSION: ${{ needs.release.outputs.new_version }}
+      ALL_FILES_SHA: ${{ needs.release.outputs.all_files_sha }}
     steps:
       # remote repo
       - name: Checkout sources
@@ -120,26 +120,22 @@ jobs:
       # changes formula
       - name: Update formula native image
         id: update-formula
-        run: scripts/update-formula.sh nosana-node.rb "${new_version}" "${all_files_sha}"
-        env:
-          new_version: ${{ env.new_version }}
-          all_files_sha: ${{ env.all_files_sha }}
+        run: scripts/update-formula.sh nosana-node.rb ${{ env.NEW_VERSION }} ${{ env.ALL_FILES_SHA }}
 
       # create PR
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.BOT_GITHUB_PAT_PUBLIC_REPO }}
-          commit-message: Update nosana-node formula to version ${{ env.new_version }}
+          commit-message: Update nosana-node formula to version ${{ env.NEW_VERSION }}
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           base: main
           branch: update-nosana-node-cli-formula
           delete-branch: true
-          title: Nosana Node brew update ${{ env.new_version }}
+          title: Nosana Node brew update ${{ env.NEW_VERSION }}
           body: |
             This PR
-            - Updates nosana-node formulas to version ${{ env.new_version }}
-            - Source archive sha is `${{ env.all_files_sha }}`
-            - All files package sha is `${{ env.all_files_sha }}`
-            - Auto-generated from [devex-cli Continuous Delivery workflow][1] ([workflow src][2])
+            - Updates nosana-node formulas to version ${{ env.NEW_VERSION }}
+            - All files package sha is `${{ env.ALL_FILES_SHA }}`
+            - Auto-generated from [nosana-ci Continuous Delivery workflow][1]
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
