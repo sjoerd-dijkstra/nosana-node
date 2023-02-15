@@ -43,7 +43,7 @@ sha256sum "all-files-${version}.tar.gz" > "all-files-${version}.tar.gz.sha256sum
 all_files_sha="$( cat "all-files-${version}.tar.gz.sha256sum" | cut -f 1 -d ' ' )"
 
 # release body
-cat <<'EOF' > "../${RELEASE_BODY_FILE}"
+cat <<EOF > "../${RELEASE_BODY_FILE}"
 ## SHA 256
 EOF
 
@@ -53,7 +53,7 @@ do
   echo "- $(cat "${file}")" >> "../${RELEASE_BODY_FILE}"
 done
 
-cat <<'EOF' > "../${RELEASE_BODY_FILE}"
+cat <<EOF >> "../${RELEASE_BODY_FILE}"
 
 ## Change log
 EOF
