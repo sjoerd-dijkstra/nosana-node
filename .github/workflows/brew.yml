@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build release
+    name: Build package
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -47,7 +47,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    name: Create release
+    name: Release package
     needs: build
     runs-on: ubuntu-latest
     env:
@@ -68,41 +68,15 @@ jobs:
         with:
           path: artifacts
 
-      # prepare
-      - name: Prepare release files
-        id: release-files
-        run: |
-          version=${tag_ref/refs\/tags\//}
-          # Create sha256sum for each release file
-          mkdir release
-          cd artifacts
-          for file in */*; do release_name="$(dirname ${file})"; cp "${file}" "../release/${release_name}-${version}"; done
-          cd ../release
-          for file in *; do sha256sum "${file}" > "${file}.sha256sum"; done
-          tar czf all-files-${version}.tar.gz *
-          sha256sum all-files-${version}.tar.gz > all-files-${version}.tar.gz.sha256sum
-          all_files_sha="$( cat all-files-${version}.tar.gz.sha256sum | cut -f 1 -d ' ' )"
-          cd ..
-          # Create release text
-          cat <<'EOF' > "${release_body_file}"
-          ## SHA 256
-          EOF
-          cd release
-          for file in *.sha256sum; do echo "- $(cat "${file}")" >> "../${release_body_file}"; done
-          cd ..
-          cat <<'EOF' >> "${release_body_file}"
-          ## Change log
-          EOF
-          echo "::set-output name=new_version::${version}"
-          echo "::set-output name=all_files_sha::${all_files_sha}"
-        env:
-          tag_ref: ${{ github.ref }}
+      # build
+      - name: Check files
+        run: ls artifacts/**/*
 
+      # release
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          body_path: ${{ env.release_body_file }}
-          files: release/*
+          files: artifacts/*
           draft: false
           prerelease: false
         env:
