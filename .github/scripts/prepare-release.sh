@@ -18,7 +18,7 @@ log_std() { echo -e "${CYAN}==> ${WHITE}${1}${RESET}"; }
 log_err() { echo -e "${RED}==> ${WHITE}${1}${RESET}"; }
 
 # vars
-version=${tag_ref/refs\/tags\//}
+version=${TAG_REF/refs\/tags\//}
 log_std "Preparing release ${GREEN}${version}"
 
 # create release directory
@@ -43,11 +43,21 @@ sha256sum "all-files-${version}.tar.gz" > "all-files-${version}.tar.gz.sha256sum
 all_files_sha="$( cat "all-files-${version}.tar.gz.sha256sum" | cut -f 1 -d ' ' )"
 
 # release body
-touch "../${RELEASE_BODY_FILE}"
+cat <<'EOF' > "../${RELEASE_BODY_FILE}"
+## SHA 256
+EOF
+
+echo "## SHA 256" > "../${RELEASE_BODY_FILE}"
 for file in *.sha256sum
 do
   echo "- $(cat "${file}")" >> "../${RELEASE_BODY_FILE}"
 done
+
+cat <<'EOF' > "../${RELEASE_BODY_FILE}"
+
+## Change log
+EOF
+echo "${CHANGE_LOG}" >> "../${RELEASE_BODY_FILE}"
 
 # github output
 echo new_version="${version}" >> "${GITHUB_OUTPUT}"

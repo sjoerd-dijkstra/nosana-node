@@ -75,12 +75,19 @@ jobs:
       - name: Check files
         run: ls artifacts/**/*
 
+      - name: Generate changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v4.0.1
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+
       # prepare release
       - name: Prepare release files
         id: release-files
         run: .github/scripts/prepare-release.sh
         env:
-          tag_ref: ${{ github.ref }}
+          TAG_REF: ${{ github.ref }}
+          CHANGE_LOG: ${{ steps.changelog.outputs.changelog }}
 
       # build
       - name: Check files
