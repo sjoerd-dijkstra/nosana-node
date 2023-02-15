@@ -102,46 +102,44 @@ jobs:
           files: release/*
           draft: false
           prerelease: false
-#
-#  update:
-#    name: Create brew tap update PR
-#    needs: release
-#    runs-on: ubuntu-latest
-#    env:
-#      new_version: ${{needs.release.outputs.new_version}}
-#      all_files_sha: ${{needs.release.outputs.all_files_sha}}
-#    steps:
-#      - name: Checkout sources
-#        uses: actions/checkout@v2
-#        with:
-#          repository: nosana-ci/homebrew-tools
-#      - name: Update formula native image
-#        id: update-formula
-#        run: |
-#          archive="${new_version}.tar.gz"
-#          curl -L -O "https://github.com/miguelaferreira/devex-cli/archive/${archive}"
-#          sha256sum "${archive}"
-#          archive_sha="$( sha256sum "${archive}" | sed -e "s/  ${archive}//" )"
-#          echo "archive-sha=${archive_sha}" >> "${GITHUB_OUTPUT}"
-#          scripts/update-formula.sh "Formula/devex-cli.rb" "${new_version}" "${archive_sha}"
-#        env:
-#          new_version: ${{ env.new_version }}
-#          all_files_sha: ${{ env.all_files_sha }}
-#      - name: Create Pull Request
-#        uses: peter-evans/create-pull-request@v3
-#        with:
-#          token: ${{ secrets.BOT_GITHUB_PAT_PUBLIC_REPO }}
-#          commit-message: "Update devex-cli formula to version ${{ env.new_version }}"
-#          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-#          base: main
-#          branch: update-devex-cli-formula
-#          delete-branch: true
-#          title: '[New tool release] DevEx cli update'
-#          body: |
-#            This PR
-#            - Updates devex-cli formulas to version ${{ env.new_version }}
-#            - Source archive sha is `${{ steps.update-formula.outputs.archive-sha }}`
-#            - All files package sha is `${{ env.all_files_sha }}`
-#            - Auto-generated from [devex-cli Continuous Delivery workflow][1] ([workflow src][2])
-#            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-#            [2]: https://github.com/miguelaferreira/devex-cli/actions/workflows/create-release.yaml
+
+  update:
+    name: Update Brew
+    needs: release
+    runs-on: ubuntu-latest
+    env:
+      new_version: ${{ needs.release.outputs.new_version }}
+      all_files_sha: ${{ needs.release.outputs.all_files_sha }}
+    steps:
+      # remote repo
+      - name: Checkout sources
+        uses: actions/checkout@v2
+        with:
+          repository: nosana-ci/homebrew-tools
+
+      # changes formula
+      - name: Update formula native image
+        id: update-formula
+        run: scripts/update-formula.sh nosana-node.rb "${new_version}" "${all_files_sha}"
+        env:
+          new_version: ${{ env.new_version }}
+          all_files_sha: ${{ env.all_files_sha }}
+
+      # create PR
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.BOT_GITHUB_PAT_PUBLIC_REPO }}
+          commit-message: Update nosana-node formula to version ${{ env.new_version }}
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          base: main
+          branch: update-nosana-node-cli-formula
+          delete-branch: true
+          title: Nosana Node brew update ${{ env.new_version }}
+          body: |
+            This PR
+            - Updates nosana-node formulas to version ${{ env.new_version }}
+            - Source archive sha is `${{ env.all_files_sha }}`
+            - All files package sha is `${{ env.all_files_sha }}`
+            - Auto-generated from [devex-cli Continuous Delivery workflow][1] ([workflow src][2])
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
