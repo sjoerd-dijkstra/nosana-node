@@ -31,13 +31,17 @@ jobs:
 
       # clojure
       - name: Install clojure tools
-        uses: DeLaGuardo/setup-clojure@9.5
+        uses: DeLaGuardo/setup-clojure@10.1
         with:
-          cli: 1.10
+          cli: latest
+
+      # clj
+      - name: Clojure check
+        run: clj --version
 
       # build
       - name: Clojure Uber Build
-        run: clojure -X:compile uberjar
+        run: clj -X:compile uberjar
 
       # artifact
       - name: '[${{ runner.os }}] Upload artifacts'
