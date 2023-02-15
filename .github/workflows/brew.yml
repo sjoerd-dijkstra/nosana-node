@@ -35,9 +35,13 @@ jobs:
         with:
           cli: latest
 
+      # clj
+      - name: Clojure check
+        run: clojure --version
+
       # build
       - name: Clojure Uber Build
-        run: clj -X:compile uberjar
+        run: clojure -X:compile uberjar
 
       # artifact
       - name: '[${{ runner.os }}] Upload artifacts'
